@@ -235,7 +235,7 @@ namespace fgui {
                 child.selected = false;
                 child.changeStateOnClick = false;
             }
-            child.on(Laya.Event.CLICK, this, this.__clickItem);
+            child.onClick(this, this.__clickItem);
 
             return child;
         }

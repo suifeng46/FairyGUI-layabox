@@ -11,8 +11,6 @@ namespace fgui {
         private _selectedTitle: string;
         private _icon: string;
         private _selectedIcon: string;
-        private _sound: string;
-        private _soundVolumeScale: number = 0;
         private _buttonController: Controller;
         private _relatedController: Controller;
         private _relatedPageId: string;
@@ -38,8 +36,6 @@ namespace fgui {
             this._mode = ButtonMode.Common;
             this._title = "";
             this._icon = "";
-            this._sound = UIConfig.buttonSound;
-            this._soundVolumeScale = UIConfig.buttonSoundVolumeScale;
             this._changeStateOnClick = true;
             this._downEffectValue = 0.8;
         }
@@ -123,22 +119,6 @@ namespace fgui {
             var tf: GTextField = this.getTextField();
             if (tf)
                 tf.fontSize = value;
-        }
-
-        public get sound(): string {
-            return this._sound;
-        }
-
-        public set sound(val: string) {
-            this._sound = val;
-        }
-
-        public get soundVolumeScale(): number {
-            return this._soundVolumeScale;
-        }
-
-        public set soundVolumeScale(value: number) {
-            this._soundVolumeScale = value;
         }
 
         public set selected(val: boolean) {
@@ -364,8 +344,8 @@ namespace fgui {
             this._mode = buffer.readByte();
             var str: string = buffer.readS();
             if (str)
-                this._sound = str;
-            this._soundVolumeScale = buffer.getFloat32();
+                this.sound = str;
+            this.soundVolumeScale = buffer.getFloat32();
             this._downEffect = buffer.readByte();
             this._downEffectValue = buffer.getFloat32();
             if (this._downEffect == 2)
@@ -424,9 +404,9 @@ namespace fgui {
 
             str = buffer.readS();
             if (str != null)
-                this._sound = str;
+                this.sound = str;
             if (buffer.readBool())
-                this._soundVolumeScale = buffer.getFloat32();
+                this.soundVolumeScale = buffer.getFloat32();
 
             this.selected = buffer.readBool();
         }
@@ -500,14 +480,6 @@ namespace fgui {
         }
 
         private __click(evt: Laya.Event): void {
-            if (this._sound) {
-                var pi: PackageItem = UIPackage.getItemByURL(this._sound);
-                if (pi)
-                    GRoot.inst.playOneShotSound(pi.file);
-                else
-                    GRoot.inst.playOneShotSound(this._sound);
-            }
-
             if (this._mode == ButtonMode.Check) {
                 if (this._changeStateOnClick) {
                     this.selected = !this._selected;

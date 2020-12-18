@@ -22,6 +22,9 @@ namespace fgui {
         public _scrollPane?: ScrollPane;
         public _alignOffset: Laya.Point;
 
+        private _sound: string;
+        private _soundVolumeScale: number = 0;
+
         constructor() {
             super();
             this._children = [];
@@ -32,6 +35,8 @@ namespace fgui {
             this._opaque = false;
             this._childrenRenderOrder = 0;
             this._apexIndex = 0;
+            this._sound = UIConfig.buttonSound;
+            this._soundVolumeScale = UIConfig.buttonSoundVolumeScale;
         }
 
         protected createDisplayObject(): void {
@@ -39,6 +44,42 @@ namespace fgui {
             this._displayObject.mouseEnabled = true;
             this._displayObject.mouseThrough = true;
             this._container = this._displayObject;
+        }
+
+        public get sound(): string {
+            return this._sound;
+        }
+
+        public set sound(val: string) {
+            this._sound = val;
+        }
+
+        public get soundVolumeScale(): number {
+            return this._soundVolumeScale;
+        }
+
+        public set soundVolumeScale(value: number) {
+            this._soundVolumeScale = value;
+        }
+
+        public onClick(thisObj: any, listener: Function, args: any[] = null): void {
+            this.on(Laya.Event.CLICK, this, this.__clickSound);
+            super.onClick(thisObj, listener, args);
+        }
+
+        public offClick(thisObj: any, listener: Function): void {
+            this.off(Laya.Event.CLICK, this, this.__clickSound);
+            super.offClick(thisObj, listener);
+        }
+
+        protected __clickSound():void {
+            if (this._sound) {
+                const pi: PackageItem = UIPackage.getItemByURL(this._sound);
+                if (pi)
+                    GRoot.inst.playOneShotSound(pi.file);
+                else
+                    GRoot.inst.playOneShotSound(this._sound);
+            }
         }
 
         public dispose(): void {
